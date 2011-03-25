@@ -19,9 +19,7 @@ addExpense(){
       1) return 1 ;;
       2) interactive ;;
   esac
-  while read line; do
-      echo ${date:-$(date +"%d. %H:%M")}\;${line} >> ${expenses}
-  done < ${cron:-=($(echo ${spec}\;${amount})}
+  writedata ${expenses}
 }
 
 addRevenue(){
@@ -32,9 +30,7 @@ addRevenue(){
       1) return 1 ;;
       2) interactive ;;
   esac
-  while read line; do
-      echo ${date:-$(date +"%d. %H:%M")}\;${line} >> ${revenues}
-  done < ${cron:-=($(echo ${spec}\;${amount})}
+  writedata ${revenues}
 }
 
 showFinancialPosition(){
@@ -87,4 +83,10 @@ checkfolder(){
     touch ${expenses}
     touch ${revenues}
   fi
+}
+
+writedata(){
+  while read line; do
+      echo ${date:-$(date +"%d. %H:%M")}\;${line} >> $1
+  done < ${cron:-=($(echo ${spec}\;${amount})}
 }
