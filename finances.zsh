@@ -7,6 +7,7 @@ format=$(date +"%Y-%m")
 monthpath=$HOME/${folder}/${format}
 expenses=${monthpath}/out
 revenues=${monthpath}/in
+dateformat="%d. %H:%M"
 cron=""
 spec=""
 amount=""
@@ -87,6 +88,6 @@ checkfolder(){
 
 writedata(){
   while read line; do
-      echo ${date:-$(date +"%d. %H:%M")}\;${line} >> $1
+      echo ${date:-$(date +${dateformat})}\;${line} >> $1
   done < ${cron:-=($(echo ${spec}\;${amount})}
 }
