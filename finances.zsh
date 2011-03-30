@@ -39,11 +39,12 @@ show(){
 }
 
 parseoptions(){
-  while getopts "c:s:a:d:" option
+  while getopts "c:s:a:d:f:" option
   do
       case $option in
               c) cron=true
                  file=$OPTARG ;;
+              f) file=$OPTARG ;;
               s) spec=$OPTARG ;;
               a) amount=$OPTARG ;;
               d) date=$OPTARG ;;
