@@ -1,5 +1,4 @@
-emulate -L zh
-
+#!/bin/zsh
 # Simple financial organizer
 
 folder="finances"
@@ -7,36 +6,31 @@ format=$(date +"%Y-%m")
 monthpath=$HOME/${folder}/${format}
 expenses=${monthpath}/out
 revenues=${monthpath}/in
+modes=(in out show)
 dateformat="%d. %H:%M"
 cron=""
 spec=""
 amount=""
 
-addExpense(){
+
+finances(){
   checkfolder
   parseoptions $@
   case $? in
       0) : ;;
-      1) return 1 ;;
+      1) exit 1 ;;
       2) interactive ;;
   esac
-  writedata ${expenses}
-}
 
-addRevenue(){
-  checkfolder
-  parseoptions $@
-  case $? in
-      0) : ;;
-      1) return 1 ;;
-      2) interactive ;;
+  case $mode in
+      "in") writedata ${revenues} ;;
+      "out") writedata ${expenses} ;;
+      "show") show ;;
   esac
-  writedata ${revenues}
 }
 
-showFinancialPosition(){
+show(){
    local totalIn totalOut total
-   checkfolder
    totalIn=$(cat ${revenues} | awk -F ";" '{SUM += $3} END {print SUM}')
    totalOut=$(cat ${expenses} | awk -F ";" '{SUM += $3} END {print SUM}')
    total=$((${totalIn:-0} - ${totalOut:-0}))
@@ -45,26 +39,33 @@ showFinancialPosition(){
 }
 
 parseoptions(){
-  if [[ -z $* ]]; then
-      return 2
-  fi
   while getopts "c:s:a:d:" option
   do
       case $option in
-              c) if [ ! -f ${monthpath}/cron ]; then
-                      cron=$OPTARG
-                      touch ${monthpath}/cron
-                 else
-                      return 1
-                 fi ;;
+              c) cron=true
+                 file=$OPTARG ;;
               s) spec=$OPTARG ;;
               a) amount=$OPTARG ;;
               d) date=$OPTARG ;;
               *) return 1 ;;
       esac
   done
-  if [[ -z cron &&  (-z $spec || -z $amount) ]]; then
-      return 1
+  shift $(($OPTIND - 1))
+
+  if [[ ${${modes[(r)$1]}:+1} -eq 1 ]]; then
+        mode=$1
+  else
+        return 1
+  fi
+
+  if [ $(($# - 1)) -eq 0 ]; then
+      return 2
+  fi
+  
+  if [ $cron ]  &&  [ ! -f ${monthpath}/cron-$1 ]; then
+        touch ${monthpath}/cron-$1
+  else
+        return 1
   fi
   return 0
 }
@@ -89,5 +90,5 @@ checkfolder(){
 writedata(){
   while read line; do
       echo ${date:-$(date +${dateformat})}\;${line} >> $1
-  done < ${cron:-=($(echo ${spec}\;${amount})}
+  done < ${file:-=($(echo ${spec}\;${amount})}
 }
