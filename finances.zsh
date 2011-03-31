@@ -11,6 +11,7 @@ dateformat="%d. %H:%M"
 cron=""
 spec=""
 amount=""
+file=""
 
 
 finances(){
@@ -39,10 +40,11 @@ show(){
 }
 
 parseoptions(){
+  argnum=$#
   while getopts "c:s:a:d:f:" option
   do
       case $option in
-              c) cron=true
+              c) cron=true;
                  file=$OPTARG ;;
               f) file=$OPTARG ;;
               s) spec=$OPTARG ;;
@@ -59,11 +61,11 @@ parseoptions(){
         return 1
   fi
 
-  if [ $(($# - 1)) -eq 0 ]; then
-      return 2
+  if [[ $mode != "show" ]] && [ $(($argnum - 1)) -eq 0 ]; then
+        return 2
   fi
   
-  if [ $cron ]  &&  [ ! -f ${monthpath}/cron-$1 ]; then
+  if $cron &&  [ ! -f ${monthpath}/cron-$1 ]; then
         touch ${monthpath}/cron-$1
   else
         return 1
