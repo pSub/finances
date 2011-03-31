@@ -40,6 +40,7 @@ show(){
 }
 
 parseoptions(){
+  cron=false
   argnum=$#
   while getopts "c:s:a:d:f:" option
   do
@@ -67,8 +68,6 @@ parseoptions(){
   
   if $cron &&  [ ! -f ${monthpath}/cron-$1 ]; then
         touch ${monthpath}/cron-$1
-  else
-        return 1
   fi
   return 0
 }
