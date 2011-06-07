@@ -13,23 +13,6 @@ spec=""
 amount=""
 file=""
 
-
-finances(){
-  checkfolder
-  parseoptions $@
-  case $? in
-      0) : ;;
-      1) exit 1 ;;
-      2) interactive ;;
-  esac
-
-  case $mode in
-      "in") writedata ${revenues} ;;
-      "out") writedata ${expenses} ;;
-      "show") show ;;
-  esac
-}
-
 show(){
    local totalIn totalOut total
    totalIn=$(cat ${revenues} | awk -F ";" '{SUM += $3} END {print SUM}')
@@ -94,3 +77,17 @@ writedata(){
       echo ${date:-$(date +${dateformat})}\;${line} >> $1
   done < ${file:-=($(echo ${spec}\;${amount})}
 }
+
+checkfolder
+parseoptions $@
+case $? in
+    0) : ;;
+    1) exit 1 ;;
+    2) interactive ;;
+esac
+
+case $mode in
+    "in") writedata ${revenues} ;;
+    "out") writedata ${expenses} ;;
+    "show") show ;;
+esac
