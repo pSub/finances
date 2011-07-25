@@ -20,7 +20,7 @@ show(){
    totalOut=$(cat ${expenses} | awk -F ";" '{SUM += $3} END {print SUM}')
    total=$((${totalIn:-0} - ${totalOut:-0}))
    if [ $quiet ]; then
-       printf "Fin: %.2f/%.2f" "$totalOut" "$totalIn"
+       printf "%.2f/%.2f" "$totalOut" "$totalIn"
    else
        printf "Revenues: %.2f\nExpenses: %.2f\nTotal:    %.2f\n" "$totalIn" "$totalOut" "$total"
    fi
