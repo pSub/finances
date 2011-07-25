@@ -8,6 +8,7 @@ expenses=${monthpath}/out
 revenues=${monthpath}/in
 modes=(in out show)
 dateformat="%d. %H:%M"
+quiet=""
 cron=""
 spec=""
 amount=""
@@ -18,16 +19,21 @@ show(){
    totalIn=$(cat ${revenues} | awk -F ";" '{SUM += $3} END {print SUM}')
    totalOut=$(cat ${expenses} | awk -F ";" '{SUM += $3} END {print SUM}')
    total=$((${totalIn:-0} - ${totalOut:-0}))
-   printf "Revenues: %.2f\nExpenses: %.2f\nTotal:    %.2f\n" "$totalIn" "$totalOut" "$total"
+   if [ $quiet ]; then
+       printf "Fin: %.2f/%.2f" "$totalOut" "$totalIn"
+   else
+       printf "Revenues: %.2f\nExpenses: %.2f\nTotal:    %.2f\n" "$totalIn" "$totalOut" "$total"
+   fi
    unset totalIn totalOut total
 }
 
 parseoptions(){
   cron=false
   argnum=$#
-  while getopts "c:s:a:d:f:" option
+  while getopts "qc:s:a:d:f:" option
   do
       case $option in
+              q) quiet=true ;;
               c) cron=true;
                  file=$OPTARG ;;
               f) file=$OPTARG ;;
